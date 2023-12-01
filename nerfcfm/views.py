@@ -78,7 +78,7 @@ class GenerateNerfModelView(generics.CreateAPIView):
         nerf_id = request.data.get('nerf_id')
         video_id = request.data.get('video_id')
 
-        # check that the are both nerf_id and video_id
+        # check that there are both nerf_id and video_id
         if not (nerf_id and video_id):
             return Response(
                 {'message': 'Need both nerf_id and video_id'}, 
