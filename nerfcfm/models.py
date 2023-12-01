@@ -31,7 +31,7 @@ class NerfModel(models.Model):
         ('complete', 'Complete'),
         ('failed', 'Failed'),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_MODEL_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_MODEL_CHOICES, default='in_progress')
 
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
