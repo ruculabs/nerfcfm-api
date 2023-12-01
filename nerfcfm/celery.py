@@ -3,9 +3,9 @@ from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nerfcfm-back.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nerfcfm.settings')
 
-app = Celery('nerfcfm-back')
+app = Celery('nerfcfm')
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 

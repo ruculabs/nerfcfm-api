@@ -3,19 +3,27 @@ from .models import Video, Nerf, NerfModel, NerfObject
 from celery import shared_task
 
 @shared_task
-def generate_nerf_model(nerf, video_id):
+def generate_nerf_model(nerf: NerfModel, video: Video) -> None:
+    """
+    given a nerf and a video, generate a model with nerfstudio
+    """
+    nerf = Nerf.objects.get(id=nerf_id)
+    if nerf:
+        
+
     try:
+        # revisar y extraer nombre del nerf
         video = Video.objects.get(id=video_id)
         subprocess.run(['python', 'ruta/a/tu/script.py', nerf, video.archivo.path])
         Modelo.objects.create(video=video, archivo='ruta/al/modelo_generado.obj')
     except Exception as e:
         print(f"Error al generar el modelo: {e}")
 
-
 @shared_task
-def generate_nerf_object(modelo_id):
+def generate_nerf_object(nerf_model_id: int) -> None:
     try:
-        modelo = Modelo.objects.get(id=modelo_id)
+
+        modelo = NerfModel.objects.get(id=nerf_model_id)
         subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
         Objeto.objects.create(modelo=modelo, archivo='ruta/al/objeto_generado.obj')
     except Exception as e:

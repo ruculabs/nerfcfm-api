@@ -1,29 +1,23 @@
-from django.urls import path
-from .views import UserRegistrationView, UserLoginView
-from .views import VideoUploadView, UserVideosView
-from .views import AllNerfsView
-from .views import GenerateNerfModelView, UserNerfModelsView
-from .views import GenerateNerfObjectView, UserNerfObjectsView
+"""
+URL configuration for nerfcfm project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-
-    # users
-    path('register/', UserRegistrationView.as_view(), name='user-registration'),
-    path('login/', UserLoginView.as_view(), name='user-login'),
-
-    # videos
-    path('upload/', VideoUploadView.as_view(), name='video-upload'),
-    path('user-videos/', UserVideosView.as_view(), name='user-videos'),
-
-    # nerfs
-    path('all-nerfs/', AllNerfsView.as_view(), name='all-nerfs'),
-
-    # models
-    path('generate-nerf-model/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
-    path('user-nerf-models/', UserNerfModelsView.as_view(), name='user-nerf-models'),
-
-    # objects
-    path('generate-nerf-object/', GenerateNerfObjectView.as_view(), name='generate-nerf-object'),
-    path('user-nerf-objects/', UserNerfObjectsView.as_view(), name='user-nerf-objects'),
-    
+    path('admin/', admin.site.urls),
+    path('api/', include('api.urls'))
 ]

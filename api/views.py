@@ -123,9 +123,9 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     status=status.HTTP_400_BAD_REQUEST)
             
             # both video and nerf, activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf.name, video.video_file)
+            generate_nerf_model.delay(nerf, video)
             return Response(
-                {'message': 'Generating model'}, 
+                {'message': f'Generating {nerf.name} model'}, 
                 status=status.HTTP_202_ACCEPTED)
         
         except:
@@ -149,13 +149,48 @@ class GenerateNerfObjectView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        modelo_id = request.data.get('modelo_id')
 
-        if modelo_id:
-            generate_nerf_object.delay(modelo_id)  # Llama a la tarea Celery en segundo plano
-            return Response({'message': 'Generando objeto, esto puede llevar tiempo.'}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response({'message': 'Se requiere modelo_id en los datos'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # get request values
+            nerf_model_id = request.data.get('nerf_model_id')
+
+            # check that there is a model_id
+            if not nerf_model_id:
+                return Response(
+                    {'message': 'Need nerf_model_id'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
+            # check that model_id is an integer
+            try:
+                nerf_model_id = int(nerf_model_id)
+            except:
+                return Response(
+                    {'message': 'nerf_model_id must be an integer'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # get nerf_model
+            nerf_model = NerfModel.objects.get(id=nerf_model_id)
+
+            if not nerf_model:
+                return Response(
+                    {'message': f'No nerf_model found for: nerf_model = {nerf_model_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # check if nerf_model has model file
+            if not nerf_model.model_file:
+                return Response(
+                    {'message': f'No model_file found for: nerf_model = {nerf_model_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # no issues with model, generate object
+            generate_nerf_object.delay(nerf_model)
+            return Response(
+                {'message': 'Generating model'}, 
+                status=status.HTTP_202_ACCEPTED)
+        
+        except:
+            # internal error
+            return Response({'message': 'Serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNerfObjectsView(generics.ListAPIView):
     serializer_class = NerfObjectListSerializer
