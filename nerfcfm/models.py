@@ -11,9 +11,9 @@ class Video(models.Model):
         return self.name
 
 class Nerf(models.Model):
-    name = models.CharField(max_length=50)
-    long_name = models.CharField(max_length=100)
-    url = models.URLField()
+    name = models.CharField(max_length=50, default='')
+    long_name = models.CharField(max_length=100, default='')
+    url = models.URLField(default='')
 
     def __str__(self):
         return self.name
