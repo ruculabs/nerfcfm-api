@@ -123,7 +123,7 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     status=status.HTTP_400_BAD_REQUEST)
             
             # both video and nerf, activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf, video)
+            generate_nerf_model.delay(nerf.name, video.video_file)
             return Response(
                 {'message': 'Generating model'}, 
                 status=status.HTTP_202_ACCEPTED)
