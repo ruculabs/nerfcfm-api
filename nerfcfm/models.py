@@ -26,6 +26,13 @@ class NerfModel(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     training_time = models.DurationField(null=True, blank=True)
 
+    STATUS_MODEL_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('complete', 'Complete'),
+        ('failed', 'Failed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_MODEL_CHOICES)
+
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
             self.training_time = self.end_date - self.start_date
