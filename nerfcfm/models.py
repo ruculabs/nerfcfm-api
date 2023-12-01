@@ -48,6 +48,13 @@ class NerfObject(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     creation_time = models.DurationField(null=True, blank=True)
 
+    STATUS_OBJECT_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('complete', 'Complete'),
+        ('failed', 'Failed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_OBJECT_CHOICES, default='in_progress')
+
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
             self.creation_time = self.end_date - self.start_date
