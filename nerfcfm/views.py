@@ -74,45 +74,63 @@ class GenerateNerfModelView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
 
-        # get request values
-        nerf_id = request.data.get('nerf_id')
-        video_id = request.data.get('video_id')
-
-        # check that there are both nerf_id and video_id
-        if not (nerf_id and video_id):
-            return Response(
-                {'message': 'Need both nerf_id and video_id'}, 
-                status=status.HTTP_400_BAD_REQUEST)
-        
-        # check if nerf_id and video_id are integers
         try:
-            nerf_id = int(nerf_id)
-            video_id = int(video_id)
+            # get request values
+            nerf_id = request.data.get('nerf_id')
+            video_id = request.data.get('video_id')
+
+            # check that there are both nerf_id and video_id
+            if not (nerf_id and video_id):
+                return Response(
+                    {'message': 'Need both nerf_id and video_id'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if nerf_id and video_id are integers
+            try:
+                nerf_id = int(nerf_id)
+                video_id = int(video_id)
+            except:
+                return Response(
+                    {'message': 'nerf_id and video_id must be integers'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # get nerf 
+            nerf = Nerf.objects.get(id=nerf_id)
+
+            if not nerf:
+                return Response(
+                    {'message': f'No nerf found for: nerf_id = {nerf_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
+            # get video
+            video = Video.objects.get(id=video_id)
+
+            if not video:
+                return Response(
+                    {'message': f'No video found for: video_id = {video_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # check if nerf has name
+            if not nerf.name:
+                return Response(
+                    {'message': f'No name found for: nerf_id = {nerf_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if video has file
+            if not video.video_file:
+                return Response(
+                    {'message': f'No file found for: video_id = {video_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
+            # both video and nerf, activate celery task for generating nerf model
+            generate_nerf_model.delay(nerf, video)
+            return Response(
+                {'message': 'Generating model'}, 
+                status=status.HTTP_202_ACCEPTED)
+        
         except:
-            return Response(
-                {'message': 'nerf_id and video_id must be integers'}, 
-                status=status.HTTP_400_BAD_REQUEST)
-
-        # get nerf 
-        nerf = Nerf.objects.get(id=nerf_id)
-
-        if not nerf:
-            return Response(
-                {'message': f'No nerf found for: nerf_id = {nerf_id}'}, 
-                status=status.HTTP_400_BAD_REQUEST)
-        
-        # get video
-        video = Video.objects.get(id=video_id)
-
-        if not video:
-            return Response(
-                {'message': f'No video found for: video_id = {video_id}'}, 
-                status=status.HTTP_400_BAD_REQUEST)
-
-        
-        # both video and nerf, activate celery task for generating nerf model
-        generate_nerf_model.delay(nerf, video)
-        return Response({'message': 'Generating model'}, status=status.HTTP_202_ACCEPTED)
+            # internal error
+            return Response({'message': 'Serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNerfModelsView(generics.ListAPIView):
     serializer_class = NerfModelListSerializer
