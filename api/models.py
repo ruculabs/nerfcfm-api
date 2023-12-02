@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Video(models.Model):
@@ -47,6 +48,10 @@ class NerfModel(models.Model):
         if self.start_date and self.end_date:
             self.training_time = self.end_date - self.start_date
         super().save(*args, **kwargs)
+    
+    def save_endtime(self):
+        self.end_date = timezone.now()
+        self.save()
 
     def __str__(self):
         return f"{self.video.name}{self.nerf.name}Model"
@@ -70,6 +75,10 @@ class NerfObject(models.Model):
         if self.start_date and self.end_date:
             self.creation_time = self.end_date - self.start_date
         super().save(*args, **kwargs)
+    
+    def save_endtime(self):
+        self.end_date = timezone.now()
+        self.save()
     
     def __str__(self):
         return f"{self.nerf_model}Object"
