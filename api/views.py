@@ -18,7 +18,7 @@ from .models import Video, Nerf, NerfModel, NerfObject
 
 from dotenv import load_dotenv
 
-load_dotenv
+load_dotenv()
 
 # USERS
 
