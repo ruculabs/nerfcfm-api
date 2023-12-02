@@ -20,6 +20,7 @@ class Nerf(models.Model):
 
 class NerfModel(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     model_file = models.FileField(upload_to='nerf_models/')
     nerf = models.ForeignKey(Nerf, on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now_add=True)
@@ -43,6 +44,7 @@ class NerfModel(models.Model):
 
 class NerfObject(models.Model):
     nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     object_file = models.FileField(upload_to='nerf_objects/')
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
