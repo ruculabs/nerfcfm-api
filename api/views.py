@@ -142,9 +142,10 @@ class GenerateNerfModelView(generics.CreateAPIView):
                 {'message': f'Generating {nerf.name} model'}, 
                 status=status.HTTP_202_ACCEPTED)
         
-        except:
+        except Exception as err:
             # internal error
-            return Response({'message': 'Serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            print(f'[GENERATE_NERF_MODEL]: {err}')
+            return Response({'message': 'Unknown serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNerfModelsView(generics.ListAPIView):
     serializer_class = NerfModelListSerializer
