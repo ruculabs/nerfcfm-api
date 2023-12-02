@@ -78,20 +78,22 @@ class GenerateNerfModelView(generics.CreateAPIView):
             # get request values
             nerf_id = request.data.get('nerf_id')
             video_id = request.data.get('video_id')
+            user_id = request.data.get('user_id')
 
             # check that there are both nerf_id and video_id
-            if not (nerf_id and video_id):
+            if not (nerf_id and video_id and user_id):
                 return Response(
-                    {'message': 'Need both nerf_id and video_id'}, 
+                    {'message': 'Need nerf_id, video_id and user_id'}, 
                     status=status.HTTP_400_BAD_REQUEST)
             
             # check if nerf_id and video_id are integers
             try:
                 nerf_id = int(nerf_id)
                 video_id = int(video_id)
+                user_id = int(user_id)
             except:
                 return Response(
-                    {'message': 'nerf_id and video_id must be integers'}, 
+                    {'message': 'nerf_id, video_id and user_id must be integers'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
             # get nerf 
@@ -109,6 +111,14 @@ class GenerateNerfModelView(generics.CreateAPIView):
                 return Response(
                     {'message': f'No video found for: video_id = {video_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
+            
+            # get user
+            user = User.objects.get(id=user_id)
+
+            if not user:
+                return Response(
+                    {'message': f'No user found for: user_id = {user_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
 
             # check if nerf has name
             if not nerf.name:
@@ -123,7 +133,7 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     status=status.HTTP_400_BAD_REQUEST)
             
             # both video and nerf, activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf, video)
+            generate_nerf_model.delay(nerf.name, video.video_file, user_id)
             return Response(
                 {'message': f'Generating {nerf.name} model'}, 
                 status=status.HTTP_202_ACCEPTED)
@@ -153,6 +163,7 @@ class GenerateNerfObjectView(generics.CreateAPIView):
         try:
             # get request values
             nerf_model_id = request.data.get('nerf_model_id')
+            nerf = request.data.get('nerf_model_id')
 
             # check that there is a model_id
             if not nerf_model_id:
