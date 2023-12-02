@@ -135,7 +135,7 @@ class GenerateNerfModelView(generics.CreateAPIView):
                 return Response(
                     {'message': f'No file found for: video_id = {video_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
-            
+
             # activate celery task for generating nerf model
             generate_nerf_model.delay(nerf=nerf, video=video, user=user)
             return Response(
@@ -144,7 +144,10 @@ class GenerateNerfModelView(generics.CreateAPIView):
         
         except Exception as err:
             # internal error
-            print(f'[GENERATE_NERF_MODEL]: {err}')
+            print('[GENERATE_NERF_MODEL]: General Exception')
+            print('-- GENERATE_NERF_MODEL EXCEPTION START --')
+            print(err)
+            print('-- GENERATE_NERF_MODEL EXCEPTION END --')
             return Response({'message': 'Unknown serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNerfModelsView(generics.ListAPIView):
