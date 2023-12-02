@@ -17,7 +17,7 @@ def generate_nerf_model(nerf: Nerf, video: Video, user: User, nerf_model_id: int
             nerf_model.status = 'complete'
         else:
             nerf_model.status = 'failed'
-            print(f"[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
+            print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
         
         nerf_model.save_endtime()
 
@@ -26,22 +26,39 @@ def generate_nerf_model(nerf: Nerf, video: Video, user: User, nerf_model_id: int
         nerf_model = NerfModel.objects.get(id=nerf_model_id)
         nerf_model.status = 'failed'
         nerf_model.save_endtime()
-        print(f"[GENERATE_MODEL_TASK]: ERROR")
+        print("[GENERATE_MODEL_TASK]: ERROR")
         print('-- GENERATE_NERF_MODEL EXCEPTION START --')
         print(err)
         print('-- GENERATE_NERF_MODEL EXCEPTION END --')
 
 @shared_task
-def generate_nerf_object(nerf_model: NerfModel, nerf_object_id: int) -> None:
+def generate_nerf_object(nerf_model: NerfModel, user: User, nerf_object_id: int, method: str = 'TSDF') -> None:
 
     try:
+        
+        # run command
+        result = subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
+        
+        # get nerf_object after result
+        nerf_object = NerfObject.objects.get(id=nerf_object_id)
 
-        modelo = NerfModel.objects.get(id=nerf_model_id)
-        subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
-        Objeto.objects.create(modelo=modelo, archivo='ruta/al/objeto_generado.obj')
+        if result.returncode == 0:
+            nerf_object.status = 'complete'
+        else:
+            nerf_object.status = 'failed'
+            print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
+        
+        nerf_object.save_endtime()
+
     except Exception as e:
-        print(f"Error al generar el objeto: {e}")
-        return None
+
+        nerf_object = NerfObject.objects.get(id=nerf_object_id)
+        nerf_object.status = 'failed'
+        nerf_model.save_endtime()
+        print("[GENERATE_OBJECT_TASK]: ERROR")
+        print('-- GENERATE_NERF_OBJECT EXCEPTION START --')
+        print(err)
+        print('-- GENERATE_NERF_OBJECT EXCEPTION END --')
 
 import requests
 from bs4 import BeautifulSoup
