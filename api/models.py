@@ -18,6 +18,14 @@ class Nerf(models.Model):
     def __str__(self):
         return self.name
 
+class ExportMethod(models.Model):
+    name = models.CharField(max_length=50, default='')
+    long_name = models.CharField(max_length=100, default='')
+    description = models.TextField(default='')
+
+    def __str__(self):
+        return self.name
+
 class NerfModel(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
