@@ -16,6 +16,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Video, Nerf, NerfModel, NerfObject
 
+from dotenv import load_dotenv
+
+load_dotenv
+
 # USERS
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -132,8 +136,8 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     {'message': f'No file found for: video_id = {video_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
             
-            # both video and nerf, activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf.name, video.video_file, user_id)
+            # activate celery task for generating nerf model
+            generate_nerf_model.delay(nerf=nerf, video=video, user=user)
             return Response(
                 {'message': f'Generating {nerf.name} model'}, 
                 status=status.HTTP_202_ACCEPTED)
