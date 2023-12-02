@@ -1,26 +1,39 @@
 import subprocess
-from .models import Video, Nerf, NerfModel, NerfObject
+from .models import User, Video, Nerf, NerfModel, NerfObject
 from celery import shared_task
 
 @shared_task
-def generate_nerf_model(nerf: NerfModel, video: Video) -> None:
-    """
-    given a nerf and a video, generate a model with nerfstudio
-    """
-    nerf = Nerf.objects.get(id=nerf_id)
-    if nerf:
-        
-
+def generate_nerf_model(nerf: Nerf, video: Video, user: User, nerf_model_id: int) -> None:
+    
     try:
-        # revisar y extraer nombre del nerf
-        video = Video.objects.get(id=video_id)
-        subprocess.run(['python', 'ruta/a/tu/script.py', nerf, video.archivo.path])
-        Modelo.objects.create(video=video, archivo='ruta/al/modelo_generado.obj')
+        
+        # run command
+        result = subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
+        
+        # get nerf_model after result
+        nerf_model = NerfModel.objects.get(id=nerf_model_id)
+
+        if result.returncode == 0:
+            nerf_model.status = 'complete'
+        else:
+            nerf_model.status = 'failed'
+            print(f"[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
+        
+        nerf_model.save_endtime()
+
     except Exception as e:
-        print(f"Error al generar el modelo: {e}")
+
+        nerf_model = NerfModel.objects.get(id=nerf_model_id)
+        nerf_model.status = 'failed'
+        nerf_model.save_endtime()
+        print(f"[GENERATE_MODEL_TASK]: ERROR")
+        print('-- GENERATE_NERF_MODEL EXCEPTION START --')
+        print(err)
+        print('-- GENERATE_NERF_MODEL EXCEPTION END --')
 
 @shared_task
-def generate_nerf_object(nerf_model_id: int) -> None:
+def generate_nerf_object(nerf_model: NerfModel, nerf_object_id: int) -> None:
+
     try:
 
         modelo = NerfModel.objects.get(id=nerf_model_id)
