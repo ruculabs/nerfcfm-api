@@ -144,7 +144,6 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     user=user,
                     nerf=nerf
                 )
-                nerf_model.save()
 
             except Exception as err:
                 # internal error
@@ -197,20 +196,33 @@ class GenerateNerfObjectView(generics.CreateAPIView):
         try:
             # get request values
             nerf_model_id = request.data.get('nerf_model_id')
-            nerf = request.data.get('nerf_model_id')
+            user_id = request.data.get('user_id')
 
-            # check that there is a model_id
-            if not nerf_model_id:
+            # TODO: add support to multiple extract methods
+            export_method = request.data.get('export_method')
+
+            # check that there is both nerf_model_id and user_id
+            if not (nerf_model_id and user_id and export_method):
                 return Response(
-                    {'message': 'Need nerf_model_id'}, 
+                    {'message': 'Need nerf_model_id, user_id and export_method'}, 
                     status=status.HTTP_400_BAD_REQUEST)
             
-            # check that model_id is an integer
+            # check that model_id and user_id are integers
             try:
                 nerf_model_id = int(nerf_model_id)
+                user_id = int(user_id)
             except:
                 return Response(
-                    {'message': 'nerf_model_id must be an integer'}, 
+                    {'message': 'nerf_model_id and user_id must be integers'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+            # check supported extract method
+            # TODO: add support to multiple extract methods
+            try:
+                assert(export_method == 'TSDF')
+            except:
+                return Response(
+                    {'message': 'nerf_model_id and user_id must be integers'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
             # get nerf_model
@@ -220,15 +232,41 @@ class GenerateNerfObjectView(generics.CreateAPIView):
                 return Response(
                     {'message': f'No nerf_model found for: nerf_model = {nerf_model_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
+            
+            # get user
+            user = User.objects.get(id=user_id)
 
+            if not user:
+                return Response(
+                    {'message': f'No user found for: user = {user_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+            
             # check if nerf_model has model file
             if not nerf_model.model_file:
                 return Response(
                     {'message': f'No model_file found for: nerf_model = {nerf_model_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
+            # create object
+            try:
+                
+                nerf_object = NerfModel.objects.create(
+                    nerf_model=nerf_model,
+                    user=user
+                )
+
+            except Exception as err:
+                # internal error
+                print('[GENERATE_NERF_OBJECT]: Create Object Exception')
+                print('-- GENERATE_NERF_OBJECT EXCEPTION START --')
+                print(err)
+                print('-- GENERATE_NERF_OBJECT EXCEPTION END --')
+                return Response(
+                    {'message': 'Error creating nerf_model, try later'}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             # no issues with model, generate object
-            generate_nerf_object.delay(nerf_model)
+            generate_nerf_object.delay(nerf_model=nerf_model, user=user, )
             return Response(
                 {'message': 'Generating model'}, 
                 status=status.HTTP_202_ACCEPTED)
