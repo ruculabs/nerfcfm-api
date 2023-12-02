@@ -136,10 +136,30 @@ class GenerateNerfModelView(generics.CreateAPIView):
                     {'message': f'No file found for: video_id = {video_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
+            # create model
+            try:
+                
+                nerf_model = NerfModel.objects.create(
+                    video=video,
+                    user=user,
+                    nerf=nerf
+                )
+                nerf_model.save()
+
+            except:
+
+                return Response(
+                    {'message': 'Error creating nerf_model, try later'}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             # activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf=nerf, video=video, user=user)
+            generate_nerf_model.delay(nerf=nerf, video=video, user=user, nerf_model_id=nerf_model.id)
+
             return Response(
-                {'message': f'Generating {nerf.name} model'}, 
+                {
+                    'message': f'Generating {nerf.name} model',
+                    'nerf_model_id': nerf_model.id
+                }, 
                 status=status.HTTP_202_ACCEPTED)
         
         except Exception as err:
@@ -148,7 +168,9 @@ class GenerateNerfModelView(generics.CreateAPIView):
             print('-- GENERATE_NERF_MODEL EXCEPTION START --')
             print(err)
             print('-- GENERATE_NERF_MODEL EXCEPTION END --')
-            return Response({'message': 'Unknown serverside error, try later'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {'message': 'Unknown serverside error, try later'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNerfModelsView(generics.ListAPIView):
     serializer_class = NerfModelListSerializer
