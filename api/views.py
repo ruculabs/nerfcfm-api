@@ -146,8 +146,12 @@ class GenerateNerfModelView(generics.CreateAPIView):
                 )
                 nerf_model.save()
 
-            except:
-
+            except Exception as err:
+                # internal error
+                print('[GENERATE_NERF_MODEL]: Create Model Exception')
+                print('-- GENERATE_NERF_MODEL EXCEPTION START --')
+                print(err)
+                print('-- GENERATE_NERF_MODEL EXCEPTION END --')
                 return Response(
                     {'message': 'Error creating nerf_model, try later'}, 
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
