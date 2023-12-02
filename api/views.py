@@ -266,9 +266,12 @@ class GenerateNerfObjectView(generics.CreateAPIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # no issues with model, generate object
-            generate_nerf_object.delay(nerf_model=nerf_model, user=user, )
+            generate_nerf_object.delay(nerf_model=nerf_model, user=user, nerf_object_id=nerf_object.id, mnethod='TSDF')
             return Response(
-                {'message': 'Generating model'}, 
+                {
+                    'message': 'Generating model with TSDF',
+                    'nerf_object_id': nerf_object.id
+                },
                 status=status.HTTP_202_ACCEPTED)
         
         except:
