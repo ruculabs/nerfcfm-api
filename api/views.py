@@ -247,6 +247,15 @@ class GenerateNerfObjectView(generics.CreateAPIView):
                     {'message': f'No model_file found for: nerf_model = {nerf_model_id}'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
+            # check if model in progress for this user
+            user_nerf_models = NerfModel.objects.filter(user=user)
+            user_in_progress_nerf_models = user_nerf_models.filter(status='in_progress')
+            if user_in_progress_nerf_models:
+                return Response(
+                    {'message': f'Nerf Model is already in progress for: user_id = {user_id}'}, 
+                    status=status.HTTP_400_BAD_REQUEST)
+
+
             # create object
             try:
                 
