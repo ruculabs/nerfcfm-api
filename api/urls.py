@@ -12,7 +12,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='user-login'),
 
     # videos
-    path('upload/', VideoUploadView.as_view(), name='video-upload'),
+    path('video-upload/', VideoUploadView.as_view(), name='video-upload'),
     path('user-videos/', UserVideosView.as_view(), name='user-videos'),
 
     # nerfs
