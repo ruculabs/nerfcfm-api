@@ -11,6 +11,32 @@ class Video(models.Model):
     def __str__(self):
         return self.name
 
+class DataType(models.Model):
+    name = models.CharField(max_length=100, default='')
+    capture_device = models.CharField(max_length=100, default='')
+    requirements = models.CharField(max_length=100, default='')
+    ns_process_data_speed = models.CharField(max_length=100, default='')
+
+    def __str__(self):
+        return self.name
+
+class Data(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    data_type = models.ForeignKey(DataType, on_delete=models.CASCADE)
+    STATUS_DATA_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('complete', 'Complete'),
+        ('failed', 'Failed'),
+    ]
+    status = models.CharField(max_length=255, choices=STATUS_DATA_CHOICES)
+    data_file = models.FileField(upload_to='data/')
+    start_date = models.DateField()
+    end_date = models.DateField()
+    creation_time = models.DurationField()
+
+    def __str__(self):
+        return f"{self.video.name}{self.data_type}Name"
+
 class Nerf(models.Model):
     name = models.CharField(max_length=50, default='')
     long_name = models.CharField(max_length=100, default='')
