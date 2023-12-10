@@ -64,11 +64,11 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
-METHODS_URL = 'https://docs.nerf.studio/nerfology/methods/'
+NERF_METHODS_URL = 'https://docs.nerf.studio/nerfology/methods/'
 
 def get_nerfs() -> [dict]:
 
-    response = requests.get(METHODS_URL)
+    response = requests.get(NERF_METHODS_URL)
     if response.status_code == 200:
 
         html = response.text
@@ -79,7 +79,7 @@ def get_nerfs() -> [dict]:
         for method in methods:
 
             method_a_tag = method.find('a')
-            method_url = METHODS_URL + method_a_tag['href']
+            method_url = NERF_METHODS_URL + method_a_tag['href']
 
             method_url_response = requests.get(method_url)
             if method_url_response.status_code == 200:
@@ -97,9 +97,48 @@ def get_nerfs() -> [dict]:
                     }
                     nerfs.append(nerf_info)
 
-        print("Success")
+        print(json.dumps(nerfs, indent=4, ensure_ascii=True))
         return nerfs
 
     else:
         print(f"Error while scrapping, code: {response.status_code}")
-        return {}
+        return []
+
+DATA_TYPES_URL = 'https://docs.nerf.studio/quickstart/custom_dataset.html'
+
+def get_data_types() -> [dict]:
+
+    response = requests.get(DATA_TYPES_URL)
+    if response.status_code == 200:
+
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        data_types = soup.select('table.docutils tbody tr')
+
+        data_types_list = []
+
+        for data_type in data_types:
+
+            columns = data_type.find_all('td')
+
+            if len(columns) >= 4:
+                name = columns[0].text.strip()
+                capture_device = columns[1].text.strip()
+                requirements = columns[2].text.strip()
+                ns_process_data_speed = columns[3].text.strip()
+
+                data_type_info = {
+                    'name': name,
+                    'capture_device': capture_device,
+                    'requirements': requirements,
+                    'ns_process_data_speed': ns_process_data_speed,
+                }
+
+                data_types_list.append(data_type_info)
+
+        print(json.dumps(data_types_list, indent=4, ensure_ascii=True))
+        return data_types_list
+
+    else:
+        print(f"Error while scrapping, code: {response.status_code}")
+        return []

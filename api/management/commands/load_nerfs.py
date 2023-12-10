@@ -1,7 +1,7 @@
 import json
 from django.core.management.base import BaseCommand
-from nerfcfm.models import Nerf
-from nerfcfm.utils import get_nerfs
+from api.models import Nerf
+from api.utils import get_nerfs
 
 class Command(BaseCommand):
     help = 'Loads Nerfs from generated JSON.'
@@ -13,4 +13,5 @@ class Command(BaseCommand):
         for nerf_data in nerfs:
             Nerf.objects.create(**nerf_data)
 
-        self.stdout.write(self.style.SUCCESS('Datos de nerfs cargados correctamente.'))
+        self.stdout.write(self.style.SUCCESS('Success loading nerf data.'))
+
