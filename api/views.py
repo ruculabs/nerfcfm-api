@@ -99,8 +99,7 @@ class AllNerfsView(generics.ListAPIView):
     serializer_class = NerfSerializer
 
 #  MODELS
-
-from .serializers import NerfModelSerializer, GenerateNerfModelSerializer
+from .serializers import NerfModelSerializer, GenerateNerfModelSerializer, NerfModelListSerializer
 from .utils import generate_nerf_model
 
 class GenerateNerfModelView(generics.CreateAPIView):
@@ -116,8 +115,7 @@ class UserNerfModelsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Retorna la lista de modelos del usuario actual
-        return Modelo.objects.filter(video__usuario=self.request.user)
+        return NerfModel.objects.filter(user=self.request.user)
 
 # EXPORT METHODS
 
