@@ -77,6 +77,11 @@ class NerfModelSerializer(serializers.ModelSerializer):
         model = NerfModel
         fields = '__all__'
 
+class NerfModelListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NerfModel
+        fields = ['id', 'model_file', 'start_date', 'end_date', 'training_time']
+
 # OBJECTS
 
 class NerfObjectSerializer(serializers.ModelSerializer):
