@@ -120,7 +120,9 @@ class NerfObject(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    nerf_object = models.ForeignKey('TuApp.NerfObject', on_delete=models.CASCADE)
+    data = models.ForeignKey(Data, on_delete=models.CASCADE)
+    nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
+    nerf_object = models.ForeignKey(NerfObject, on_delete=models.CASCADE)
     detail_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Detail Rating')
     definition_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Definition Rating')
     usability_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Usability Rating')
