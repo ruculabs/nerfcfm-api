@@ -14,7 +14,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Video, Nerf, NerfModel, NerfObject
+from .models import Video, DataType, Data, Nerf, NerfModel, ExportMethod, NerfObject
 
 from dotenv import load_dotenv
 
@@ -62,6 +62,19 @@ class UserVideosView(generics.ListAPIView):
 
     def get_queryset(self):
         return Video.objects.filter(user=self.request.user)
+
+# DATA TYPES
+
+class AllDataTypesView(generics.ListAPIView):
+    pass
+
+# DATA
+
+class GenerateDataView(generics.ListAPIView):
+    pass
+
+class UserDataView(generics.ListAPIView):
+    pass
 
 # NERFS
 
@@ -183,6 +196,10 @@ class UserNerfModelsView(generics.ListAPIView):
         # Retorna la lista de modelos del usuario actual
         return Modelo.objects.filter(video__usuario=self.request.user)
 
+# EXPORT METHODS
+
+class AllExportMethodsView(generics.ListAPIView):
+    pass
 
 # OBJECTS
 
@@ -294,4 +311,25 @@ class UserNerfObjectsView(generics.ListAPIView):
     def get_queryset(self):
         return Objeto.objects.filter(modelo__video__usuario=self.request.user)
 
+# REVIEWS
 
+class AddReviewView(generics.CreateAPIView):
+    pass
+
+class DataTypeReviewsView(generics.ListAPIView):
+    pass
+
+class DataReviewsView(generics.ListAPIView):
+    pass
+
+class NerfReviewsView(generics.ListAPIView):
+    pass
+
+class NerfModelReviewsView(generics.ListAPIView):
+    pass
+
+class ExportMethodReviewsViews(generics.ListAPIView):
+    pass
+
+class NerfObjectReviewsView(generics.ListAPIView):
+    pass
