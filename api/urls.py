@@ -21,8 +21,8 @@ urlpatterns = [
     path('all-data-types/', AllDataTypesView.as_view(), name='all-data-types'),
 
     # data
+    path('generate-data/', GenerateDataView.as_view(), name='generate-data'),
     path('user-data/', UserDataView.as_view(), name='user-data'),
-    path('generate-data/', GenerateDataView.as_view(), name='user-data'),
 
     # nerfs
     path('all-nerfs/', AllNerfsView.as_view(), name='all-nerfs'),
