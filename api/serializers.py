@@ -91,13 +91,15 @@ class ExportMethodSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # OBJECTS
+from .models import NerfObject
+
+class GenerateNerfObjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NerfObject
+        fields = ['nerf_model', 'user']
+        read_only_fields = ['user']
 
 class NerfObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = NerfObject
         fields = '__all__'
-
-class NerfObjectListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NerfObject
-        fields = ['id', 'archivo', 'fecha_creacion']
