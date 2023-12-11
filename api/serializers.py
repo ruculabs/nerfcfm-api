@@ -38,6 +38,8 @@ class DataTypeSerializer(serializers.ModelSerializer):
         model = DataType
         fields = '__all__'
 
+from .models import Data
+
 # DATA
 
 class GenerateDataSerializer(serializers.ModelSerializer):
@@ -51,12 +53,14 @@ class UserDataSerializer(serializers.ModelSerializer):
         model = Data
         fields = '__all__'
 
+from .models import Nerf
+
 # NERFS
 
 class NerfSerializer(serializers.ModelSerializer):
     class Meta:
         model = Nerf
-        fields = ['id', 'name', 'long_name', 'url']
+        fields = '__all__'
 
 # MODELS
 
