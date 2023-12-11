@@ -10,10 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# users
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, UserLoginSerializer
-
-# USERS
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -39,10 +38,9 @@ class UserLoginView(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk, 'username': user.username}, status=status.HTTP_200_OK)
 
+# videos
 from .models import Video
 from .serializers import VideoUploadSerializer, VideoListSerializer
-
-# VIDEOS
 
 class VideoUploadView(generics.CreateAPIView):
     queryset = Video.objects.all()
@@ -59,19 +57,18 @@ class UserVideosView(generics.ListAPIView):
     def get_queryset(self):
         return Video.objects.filter(user=self.request.user)
 
+# data types
 from .models import DataType
 from .serializers import DataTypeSerializer
-
-# DATA TYPES
 
 class AllDataTypesView(generics.ListAPIView):
     queryset = DataType.objects.all()
     serializer_class = DataTypeSerializer
 
+# data
 from .models import Data
 from .serializers import GenerateDataSerializer, UserDataSerializer
-
-# DATA
+from .utils import generate_nerf_object
 
 class GenerateDataView(generics.CreateAPIView):
     queryset = Data.objects.all()
@@ -80,7 +77,7 @@ class GenerateDataView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        run_nerfstudio_command(serializer.data) 
+        generate_data.delay(serializer.data) 
 
 class UserDataView(generics.ListAPIView):
     serializer_class = UserDataSerializer
@@ -89,16 +86,16 @@ class UserDataView(generics.ListAPIView):
     def get_queryset(self):
         return Data.objects.filter(user=self.request.user)
 
+# nerfs
 from .models import Nerf
 from .serializers import NerfSerializer
 
-# NERFS
 
 class AllNerfsView(generics.ListAPIView):
     queryset = Nerf.objects.all()
     serializer_class = NerfSerializer
 
-#  MODELS
+# nerf models
 from .serializers import NerfModelSerializer, GenerateNerfModelSerializer, NerfModelListSerializer
 from .utils import generate_nerf_model
 
@@ -117,7 +114,7 @@ class UserNerfModelsView(generics.ListAPIView):
     def get_queryset(self):
         return NerfModel.objects.filter(user=self.request.user)
 
-# EXPORT METHODS
+# export methods
 from .models import ExportMethod
 from .serializers import ExportMethodSerializer
 
@@ -125,7 +122,7 @@ class AllExportMethodsView(generics.ListAPIView):
     queryset = ExportMethod.objects.all()
     serializer_class = ExportMethodSerializer
 
-# OBJECTS
+# nerf objects
 from .models import NerfObject
 from .serializers import NerfObjectSerializer, GenerateNerfObjectSerializer
 from .utils import generate_nerf_object
@@ -145,7 +142,7 @@ class UserNerfObjectsView(generics.ListAPIView):
     def get_queryset(self):
         return Objeto.objects.filter(modelo__video__usuario=self.request.user)
 
-# REVIEWS
+# reviews
 from .models import Review
 from .serializers import ReviewSerializer, AddReviewSerializer
 
