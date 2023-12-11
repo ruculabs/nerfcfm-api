@@ -7,46 +7,47 @@ from .views import AllNerfsView
 from .views import GenerateNerfModelView, UserNerfModelsView
 from .views import AllExportMethodsView
 from .views import GenerateNerfObjectView, UserNerfObjectsView
-from .views import AddReviewView, DataTypeReviews, DataReviews, NerfReviews, NerfModelReviews, ExportMethodReviews, NerfObjectReviews 
+from .views import AddReviewView, AllReviewsView, DataTypeReviewsView, DataReviewsView, NerfReviewsView, NerfModelReviewsView, ExportMethodReviewsView, NerfObjectReviewsView 
 
 urlpatterns = [
 
     # users
-    path('register/', UserRegistrationView.as_view(), name='user-registration'),
-    path('login/', UserLoginView.as_view(), name='user-login'),
+    path('user/register/', UserRegistrationView.as_view(), name='user-registration'),
+    path('user/login/', UserLoginView.as_view(), name='user-login'),
 
     # videos
-    path('video-upload/', VideoUploadView.as_view(), name='video-upload'),
-    path('user/videos/', UserVideosView.as_view(), name='user-videos'),
+    path('videos/upload/', VideoUploadView.as_view(), name='video-upload'),
+    path('videos/user/', UserVideosView.as_view(), name='user-videos'),
 
     # data types
-    path('all-data-types/', AllDataTypesView.as_view(), name='all-data-types'),
+    path('data-types/all/', AllDataTypesView.as_view(), name='all-data-types'),
 
     # data
-    path('generate/data/', GenerateDataView.as_view(), name='generate-data'),
-    path('user/data/', UserDataView.as_view(), name='user-data'),
+    path('data/generate/', GenerateDataView.as_view(), name='generate-data'),
+    path('data/user/', UserDataView.as_view(), name='user-data'),
 
     # nerfs
-    path('all-nerfs/', AllNerfsView.as_view(), name='all-nerfs'),
+    path('nerfs/all/', AllNerfsView.as_view(), name='all-nerfs'),
 
     # nerf models
-    path('generate/nerf-model/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
-    path('user/nerf-models/', UserNerfModelsView.as_view(), name='user-nerf-models'),
+    path('nerf-models/all/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
+    path('nerf-models/user/', UserNerfModelsView.as_view(), name='user-nerf-models'),
 
     # export methods
-    path('all-export-methods', AllExportMethodsView.as_view(), name='all-export-methods'),
+    path('export-methods/all/', AllExportMethodsView.as_view(), name='all-export-methods'),
 
     # nerf objects
     path('generate/nerf-object/', GenerateNerfObjectView.as_view(), name='generate-nerf-object'),
     path('user/nerf-objects/', UserNerfObjectsView.as_view(), name='user-nerf-objects'),
 
     # reviews
-    path('add-review/', AddReviewView.as_view(), name='add-review'),
-    path('reviews/data-type/', DataTypeReviews.as_view(), name='reviews-data-type'),
-    path('reviews/data/', DataReviews.as_view(), name='reviews-data'),
-    path('reviews/nerf/', NerfReviews.as_view(), name='reviews-nerf'),
-    path('reviews/nerf-model/', NerfModelReviews.as_view(), name='reviews-nerf-model'),
-    path('reviews/export-method/', ExportMethodReviews.as_view(), name='reviews-export-method'),
-    path('reviews/nerf-object/', NerfObjectReviews.as_view(), name='reviews-nerf-objects')
+    path('reviews/add/', AddReviewView.as_view(), name='add-review'),
+    path('reviews/all/', AllReviewsView.as_view(), name='all-reviews'),
+    path('reviews/data-type/', DataTypeReviewsView.as_view(), name='reviews-data-type'),
+    path('reviews/data/', DataReviewsView.as_view(), name='reviews-data'),
+    path('reviews/nerf/', NerfReviewsView.as_view(), name='reviews-nerf'),
+    path('reviews/nerf-model/', NerfModelReviewsView.as_view(), name='reviews-nerf-model'),
+    path('reviews/export-method/', ExportMethodReviewsView.as_view(), name='reviews-export-method'),
+    path('reviews/nerf-object/', NerfObjectReviewsView.as_view(), name='reviews-nerf-objects')
 
 ]
