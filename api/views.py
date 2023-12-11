@@ -118,9 +118,12 @@ class UserNerfModelsView(generics.ListAPIView):
         return NerfModel.objects.filter(user=self.request.user)
 
 # EXPORT METHODS
+from .models import ExportMethod
+from .serializers import ExportMethodSerializer
 
 class AllExportMethodsView(generics.ListAPIView):
-    pass
+    queryset = ExportMethod.objects.all()
+    serializer_class = ExportMethodSerializer
 
 # OBJECTS
 
