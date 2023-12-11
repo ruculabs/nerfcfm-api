@@ -100,109 +100,16 @@ class AllNerfsView(generics.ListAPIView):
 
 #  MODELS
 
+from .serializers import NerfModelSerializer, GenerateNerfModelSerializer
 from .utils import generate_nerf_model
 
 class GenerateNerfModelView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = GenerateNerfModelSerializer
 
-    def post(self, request, *args, **kwargs):
-
-        try:
-            # get request values
-            nerf_id = request.data.get('nerf_id')
-            video_id = request.data.get('video_id')
-            user_id = request.data.get('user_id')
-
-            # check that there are both nerf_id and video_id
-            if not (nerf_id and video_id and user_id):
-                return Response(
-                    {'message': 'Need nerf_id, video_id and user_id'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-            
-            # check if nerf_id and video_id are integers
-            try:
-                nerf_id = int(nerf_id)
-                video_id = int(video_id)
-                user_id = int(user_id)
-            except:
-                return Response(
-                    {'message': 'nerf_id, video_id and user_id must be integers'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-
-            # get nerf 
-            nerf = Nerf.objects.get(id=nerf_id)
-
-            if not nerf:
-                return Response(
-                    {'message': f'No nerf found for: nerf_id = {nerf_id}'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-            
-            # get video
-            video = Video.objects.get(id=video_id)
-
-            if not video:
-                return Response(
-                    {'message': f'No video found for: video_id = {video_id}'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-            
-            # get user
-            user = User.objects.get(id=user_id)
-
-            if not user:
-                return Response(
-                    {'message': f'No user found for: user_id = {user_id}'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-
-            # check if nerf has name
-            if not nerf.name:
-                return Response(
-                    {'message': f'No name found for: nerf_id = {nerf_id}'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-            
-            # check if video has file
-            if not video.video_file:
-                return Response(
-                    {'message': f'No file found for: video_id = {video_id}'}, 
-                    status=status.HTTP_400_BAD_REQUEST)
-
-            # create model
-            try:
-                
-                nerf_model = NerfModel.objects.create(
-                    video=video,
-                    user=user,
-                    nerf=nerf
-                )
-
-            except Exception as err:
-                # internal error
-                print('[GENERATE_NERF_MODEL]: Create Model Exception')
-                print('-- GENERATE_NERF_MODEL EXCEPTION START --')
-                print(err)
-                print('-- GENERATE_NERF_MODEL EXCEPTION END --')
-                return Response(
-                    {'message': 'Error creating nerf_model, try later'}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            # activate celery task for generating nerf model
-            generate_nerf_model.delay(nerf=nerf, video=video, user=user, nerf_model_id=nerf_model.id)
-
-            return Response(
-                {
-                    'message': f'Generating {nerf.name} model',
-                    'nerf_model_id': nerf_model.id
-                }, 
-                status=status.HTTP_202_ACCEPTED)
-        
-        except Exception as err:
-            # internal error
-            print('[GENERATE_NERF_MODEL]: General Exception')
-            print('-- GENERATE_NERF_MODEL EXCEPTION START --')
-            print(err)
-            print('-- GENERATE_NERF_MODEL EXCEPTION END --')
-            return Response(
-                {'message': 'Unknown serverside error, try later'}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        generate_nerf_model.delay(serializer.data) 
 
 class UserNerfModelsView(generics.ListAPIView):
     serializer_class = NerfModelListSerializer
