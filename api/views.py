@@ -146,9 +146,15 @@ class UserNerfObjectsView(generics.ListAPIView):
         return Objeto.objects.filter(modelo__video__usuario=self.request.user)
 
 # REVIEWS
+from .models import Review
+from .serializers import ReviewSerializer, AddReviewSerializer
 
 class AddReviewView(generics.CreateAPIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddReviewSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class DataTypeReviewsView(generics.ListAPIView):
     pass
