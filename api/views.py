@@ -68,10 +68,19 @@ class AllDataTypesView(generics.ListAPIView):
     queryset = DataType.objects.all()
     serializer_class = DataTypeSerializer
 
+from .models import Data
+from .serializers import GenerateDataSerializer 
+
 # DATA
 
-class GenerateDataView(generics.ListAPIView):
-    pass
+class GenerateDataView(generics.CreateAPIView):
+    queryset = Data.objects.all()
+    serializer_class = GenerateDataSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        run_nerfstudio_command(serializer.data) 
 
 class UserDataView(generics.ListAPIView):
     pass
