@@ -103,3 +103,17 @@ class NerfObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = NerfObject
         fields = '__all__'
+
+# SERIALIZER
+from .models import Review
+
+class AddReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['user', 'object', 'definition_rating', 'detail_rating', 'usability_rating', 'comment']
+        read_only_fields = ['user']
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
