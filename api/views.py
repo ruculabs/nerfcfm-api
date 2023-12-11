@@ -89,6 +89,9 @@ class UserDataView(generics.ListAPIView):
     def get_queryset(self):
         return Data.objects.filter(user=self.request.user)
 
+from .models import Nerf
+from .serializers import NerfSerializer
+
 # NERFS
 
 class AllNerfsView(generics.ListAPIView):
