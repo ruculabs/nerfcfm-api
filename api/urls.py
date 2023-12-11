@@ -2,6 +2,7 @@ from django.urls import path
 from .views import UserRegistrationView, UserLoginView
 from .views import VideoUploadView, UserVideosView
 from .views import AllDataTypesView
+from .views import UserDataView, GenerateDataView
 from .views import AllNerfsView
 from .views import GenerateNerfModelView, UserNerfModelsView
 from .views import GenerateNerfObjectView, UserNerfObjectsView
@@ -20,6 +21,8 @@ urlpatterns = [
     path('all-data-types/', AllDataTypesView.as_view(), name='all-data-types'),
 
     # data
+    path('user-data/', UserDataView.as_view(), name='user-data'),
+    path('generate-data/', GenerateDataView.as_view(), name='user-data'),
 
     # nerfs
     path('all-nerfs/', AllNerfsView.as_view(), name='all-nerfs'),
