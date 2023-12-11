@@ -38,6 +38,14 @@ class DataTypeSerializer(serializers.ModelSerializer):
         model = DataType
         fields = '__all__'
 
+# DATA
+
+class GenerateDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Data
+        fields = ['id', 'user', 'video', 'data_type', 'status', 'data_file', 'start_date', 'end_date', 'creation_time']
+        read_only_fields = ['id', 'user', 'status', 'data_file', 'start_date', 'end_date', 'creation_time']
+
 # NERFS
 
 class NerfSerializer(serializers.ModelSerializer):
