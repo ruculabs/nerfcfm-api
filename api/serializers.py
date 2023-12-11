@@ -1,6 +1,6 @@
 from rest_framework import serializers
+
 from django.contrib.auth.models import User
-from .models import Video, Nerf, NerfModel, NerfObject
 
 # USERS
 
@@ -14,12 +14,9 @@ class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(style={'input_type': 'password'})
 
-# VIDEOS
+from .models import Video
 
-class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = '__all__'
+# VIDEOS
 
 class VideoUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +27,16 @@ class VideoUploadSerializer(serializers.ModelSerializer):
 class VideoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ['id', 'nombre', 'fecha_subida']
+        fields = ['id', 'name', 'upload_date']
+
+from .models import DataType
+
+# DATA TYPE
+
+class DataTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataType
+        fields = '__all__'
 
 # NERFS
 

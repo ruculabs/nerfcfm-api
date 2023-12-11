@@ -1,24 +1,17 @@
-from django.contrib.auth.models import User
-
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
-
-from .serializers import UserSerializer, UserLoginSerializer
-from .serializers import VideoUploadSerializer, VideoListSerializer
-from .serializers import NerfSerializer
-from .serializers import NerfModelListSerializer
-from .serializers import NerfObjectListSerializer
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Video, DataType, Data, Nerf, NerfModel, ExportMethod, NerfObject
-
 from dotenv import load_dotenv
 
 load_dotenv()
+
+from django.contrib.auth.models import User
+from .serializers import UserSerializer, UserLoginSerializer
 
 # USERS
 
@@ -32,7 +25,7 @@ class UserRegistrationView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(
-            {'message': 'Usuario registrado exitosamente'}, 
+            {'message': 'User registration succesful'}, 
             status=status.HTTP_201_CREATED, 
             headers=headers)
 
@@ -45,6 +38,9 @@ class UserLoginView(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk, 'username': user.username}, status=status.HTTP_200_OK)
+
+from .models import Video
+from .serializers import VideoUploadSerializer, VideoListSerializer
 
 # VIDEOS
 
@@ -63,10 +59,14 @@ class UserVideosView(generics.ListAPIView):
     def get_queryset(self):
         return Video.objects.filter(user=self.request.user)
 
+from .models import DataType
+from .serializers import DataTypeSerializer
+
 # DATA TYPES
 
 class AllDataTypesView(generics.ListAPIView):
-    pass
+    queryset = DataType.objects.all()
+    serializer_class = DataTypeSerializer
 
 # DATA
 
