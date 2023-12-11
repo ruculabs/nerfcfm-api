@@ -5,11 +5,13 @@ from django.contrib.auth.models import User
 class Video(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     video_file = models.FileField(upload_to='videos/')
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+### Video -> Data
 
 class DataType(models.Model):
     name = models.CharField(max_length=100, default='')
@@ -21,6 +23,7 @@ class DataType(models.Model):
         return self.name
 
 class Data(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     data_type = models.ForeignKey(DataType, on_delete=models.CASCADE)
     STATUS_DATA_CHOICES = [
@@ -37,6 +40,8 @@ class Data(models.Model):
     def __str__(self):
         return f"{self.video.name}{self.data_type}Name"
 
+# Data -> NerfModel
+
 class Nerf(models.Model):
     name = models.CharField(max_length=50, default='')
     long_name = models.CharField(max_length=100, default='')
@@ -46,17 +51,9 @@ class Nerf(models.Model):
     def __str__(self):
         return self.name
 
-class ExportMethod(models.Model):
-    name = models.CharField(max_length=50, default='')
-    long_name = models.CharField(max_length=100, default='')
-    description = models.TextField(default='')
-
-    def __str__(self):
-        return self.name
-
 class NerfModel(models.Model):
-    video = models.ForeignKey(Video, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    data = models.ForeignKey(Data, on_delete=models.CASCADE)
     model_file = models.FileField(upload_to='nerf_models/')
     nerf = models.ForeignKey(Nerf, on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now_add=True)
@@ -80,11 +77,21 @@ class NerfModel(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.video.name}{self.nerf.name}Model"
+        return f"{self.data.video}{self.nerf.name}Model"
+
+### NerfModel -> NerfObject
+
+class ExportMethod(models.Model):
+    name = models.CharField(max_length=50, default='')
+    long_name = models.CharField(max_length=100, default='')
+    description = models.TextField(default='')
+
+    def __str__(self):
+        return self.name
 
 class NerfObject(models.Model):
-    nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
     object_file = models.FileField(upload_to='nerf_objects/')
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
@@ -109,3 +116,16 @@ class NerfObject(models.Model):
     def __str__(self):
         return f"{self.nerf_model}Object"
 
+### Reviews
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    nerf_object = models.ForeignKey('TuApp.NerfObject', on_delete=models.CASCADE)
+    detail_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Detail Rating')
+    definition_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Definition Rating')
+    usability_rating = models.PositiveIntegerField(default=0, choices=[(i, i) for i in range(1, 6)], verbose_name='Usability Rating')
+    comment = models.TextField(blank=True)
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.nerf_object}"
