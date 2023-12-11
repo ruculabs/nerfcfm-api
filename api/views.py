@@ -153,33 +153,43 @@ class AddReviewView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+class AllReviewsView(generics.ListAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
 # TODO: Fix filter criteria
 
-class ReviewsDataView(generics.ListAPIView):
+class DataTypeReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
-        return Review.objects.filter(object__data_type__user=self.request.user)
+        return Review.objects.filter(object__data__user=self.request.user)
 
-class ReviewsNerfView(generics.ListAPIView):
+class DataReviewsView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(object__data__user=self.request.user)
+
+class NerfReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
         return Review.objects.filter(object__nerf_model__nerf__user=self.request.user)
 
-class ReviewsNerfModelView(generics.ListAPIView):
+class NerfModelReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
         return Review.objects.filter(object__nerf_model__user=self.request.user)
 
-class ReviewsExportMethodView(generics.ListAPIView):
+class ExportMethodReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
         return Review.objects.filter(object__export_method__user=self.request.user)
 
-class ReviewsNerfObjectView(generics.ListAPIView):
+class NerfObjectReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
