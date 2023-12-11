@@ -5,6 +5,7 @@ from .views import AllDataTypesView
 from .views import UserDataView, GenerateDataView
 from .views import AllNerfsView
 from .views import GenerateNerfModelView, UserNerfModelsView
+from .views import AllExportMethodsView
 from .views import GenerateNerfObjectView, UserNerfObjectsView
 
 urlpatterns = [
@@ -30,6 +31,9 @@ urlpatterns = [
     # nerf models
     path('generate-nerf-model/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
     path('user-nerf-models/', UserNerfModelsView.as_view(), name='user-nerf-models'),
+
+    # export methods
+    path('all-export-methods', AllExportMethodsView.as_view(), name='all-export-methods'),
 
     # nerf objects
     path('generate-nerf-object/', GenerateNerfObjectView.as_view(), name='generate-nerf-object'),
