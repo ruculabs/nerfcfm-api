@@ -38,20 +38,20 @@ class UserLoginView(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user_id': user.pk, 'username': user.username}, status=status.HTTP_200_OK)
 
-# videos
-from .models import Video
-from .serializers import VideoUploadSerializer, VideoListSerializer
+# data
+from .models import Data 
+from .serializers import DataUploadSerializer, DataListSerializer
 
 class VideoUploadView(generics.CreateAPIView):
     queryset = Video.objects.all()
-    serializer_class = VideoUploadSerializer
+    serializer_class = DataUploadSerializer
     permission_classes = [IsAuthenticated]  
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 class UserVideosView(generics.ListAPIView):
-    serializer_class = VideoListSerializer
+    serializer_class = DataListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
