@@ -34,8 +34,8 @@ class ProcessedData(models.Model):
         ('failed', 'Failed'),
     ]
     status = models.CharField(max_length=255, choices=STATUS_DATA_CHOICES)
-    data_file = models.FileField(upload_to='data/')
-    
+    processed_data_file = models.FileField(upload_to='data/')
+
     start_date = models.DateField()
     end_date = models.DateField()
     processing_time = models.DurationField()
@@ -63,7 +63,7 @@ class Nerf(models.Model):
 
 class NerfModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    data = models.ForeignKey(Data, on_delete=models.CASCADE)
+    processed_data = models.ForeignKey(ProcessedData, on_delete=models.CASCADE)
 
     model_file = models.FileField(upload_to='nerf_models/')
     nerf = models.ForeignKey(Nerf, on_delete=models.CASCADE)
@@ -89,7 +89,7 @@ class NerfModel(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.data.video}{self.nerf.name}Model"
+        return f"{self.nerf.name}Model"
 
 ### NerfModel -> NerfObject
 
