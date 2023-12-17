@@ -42,20 +42,20 @@ class UserLoginView(ObtainAuthToken):
 from .models import Data 
 from .serializers import DataUploadSerializer, DataListSerializer
 
-class VideoUploadView(generics.CreateAPIView):
-    queryset = Video.objects.all()
+class DataUploadView(generics.CreateAPIView):
+    queryset = Data.objects.all()
     serializer_class = DataUploadSerializer
     permission_classes = [IsAuthenticated]  
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class UserVideosView(generics.ListAPIView):
+class DataVideosView(generics.ListAPIView):
     serializer_class = DataListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Video.objects.filter(user=self.request.user)
+        return Data.objects.filter(user=self.request.user)
 
 # data types
 from .models import DataType
@@ -66,13 +66,13 @@ class AllDataTypesView(generics.ListAPIView):
     serializer_class = DataTypeSerializer
 
 # data
-from .models import Data
-from .serializers import GenerateDataSerializer, UserDataSerializer
+from .models import ProcessedData
+from .serializers import GenerateProcessedDataSerializer, UserProcessedDataSerializer
 from .utils import generate_nerf_object
 
 class GenerateDataView(generics.CreateAPIView):
-    queryset = Data.objects.all()
-    serializer_class = GenerateDataSerializer
+    queryset = ProcessedData.objects.all()
+    serializer_class = GenerateProcessedDataSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -80,11 +80,11 @@ class GenerateDataView(generics.CreateAPIView):
         generate_data.delay(serializer.data)
 
 class UserDataView(generics.ListAPIView):
-    serializer_class = UserDataSerializer
+    serializer_class = UserProcessedDataSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Data.objects.filter(user=self.request.user)
+        return ProcessedData.objects.filter(user=self.request.user)
 
 # nerfs
 from .models import Nerf
