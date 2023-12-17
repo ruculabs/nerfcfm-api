@@ -1,12 +1,22 @@
 from django.urls import path
+
+# login - register
 from .views import UserRegistrationView, UserLoginView
-from .views import VideoUploadView, UserVideosView
+# data
+from .views import DataUploadView, UserDataView
+# datatypes
 from .views import AllDataTypesView
-from .views import UserDataView, GenerateDataView
+# processed data
+from .views import GenerateProcessedDataView, UserProcessedDataView
+# nerfs
 from .views import AllNerfsView
+# nerf model
 from .views import GenerateNerfModelView, UserNerfModelsView
+# export method
 from .views import AllExportMethodsView
+# nerf object
 from .views import GenerateNerfObjectView, UserNerfObjectsView
+# reviews
 from .views import AddReviewView, AllReviewsView, DataTypeReviewsView, DataReviewsView, NerfReviewsView, NerfModelReviewsView, ExportMethodReviewsView, NerfObjectReviewsView 
 
 urlpatterns = [
@@ -15,16 +25,16 @@ urlpatterns = [
     path('user/register/', UserRegistrationView.as_view(), name='user-registration'),
     path('user/login/', UserLoginView.as_view(), name='user-login'),
 
-    # videos
-    path('videos/upload/', VideoUploadView.as_view(), name='video-upload'),
-    path('videos/user/', UserVideosView.as_view(), name='user-videos'),
+    # data
+    path('data/upload/', DataUploadView.as_view(), name='upload-data'),
+    path('data/user/', UserVideosView.as_view(), name='user-data'),
 
     # data types
     path('data-types/all/', AllDataTypesView.as_view(), name='all-data-types'),
 
-    # data
-    path('data/generate/', GenerateDataView.as_view(), name='generate-data'),
-    path('data/user/', UserDataView.as_view(), name='user-data'),
+    # processed-data
+    path('processed-data/generate/', GenerateDataView.as_view(), name='generate-processed-data'),
+    path('processed-data/user/', UserDataView.as_view(), name='user-processed-data'),
 
     # nerfs
     path('nerfs/all/', AllNerfsView.as_view(), name='all-nerfs'),
