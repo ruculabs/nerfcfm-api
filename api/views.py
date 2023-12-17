@@ -50,7 +50,7 @@ class DataUploadView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class DataVideosView(generics.ListAPIView):
+class UserDataView(generics.ListAPIView):
     serializer_class = DataListSerializer
     permission_classes = [IsAuthenticated]
 
@@ -70,7 +70,7 @@ from .models import ProcessedData
 from .serializers import GenerateProcessedDataSerializer, UserProcessedDataSerializer
 from .utils import generate_nerf_object
 
-class GenerateDataView(generics.CreateAPIView):
+class GenerateProcessedDataView(generics.CreateAPIView):
     queryset = ProcessedData.objects.all()
     serializer_class = GenerateProcessedDataSerializer
     permission_classes = [IsAuthenticated]
@@ -79,7 +79,7 @@ class GenerateDataView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
         generate_data.delay(serializer.data)
 
-class UserDataView(generics.ListAPIView):
+class UserProcessedDataView(generics.ListAPIView):
     serializer_class = UserProcessedDataSerializer
     permission_classes = [IsAuthenticated]
 
