@@ -77,7 +77,7 @@ class GenerateDataView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        generate_data.delay(serializer.data) 
+        generate_data.delay(serializer.data)
 
 class UserDataView(generics.ListAPIView):
     serializer_class = UserDataSerializer
@@ -136,7 +136,7 @@ class GenerateNerfObjectView(generics.CreateAPIView):
         generate_nerf_object.delay(serializer.data)
 
 class UserNerfObjectsView(generics.ListAPIView):
-    serializer_class = NerfObjectListSerializer
+    serializer_class = NerfObjectSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
