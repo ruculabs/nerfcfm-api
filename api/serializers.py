@@ -42,15 +42,15 @@ from .models import ProcessedData
 
 # DATA
 
-class GenerateDataSerializer(serializers.ModelSerializer):
+class GenerateProcessedDataSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Data
-        fields = ['id', 'user', 'video', 'data_type', 'status', 'data_file', 'start_date', 'end_date', 'creation_time']
-        read_only_fields = ['id', 'user', 'status', 'data_file', 'start_date', 'end_date', 'creation_time']
+        model = ProcessedData
+        fields = ['id', 'user', 'data', 'data_type', 'status', 'processed_data_file', 'start_date', 'end_date', 'processing_time']
+        read_only_fields = ['id', 'user', 'status', 'processed_data_file', 'start_date', 'end_date', 'processing_time']
 
-class UserDataSerializer(serializers.ModelSerializer):
+class UserProcessedDataSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Data
+        model = ProcessedData
         fields = '__all__'
 
 from .models import Nerf
@@ -69,7 +69,7 @@ from .models import NerfModel
 class GenerateNerfModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = NerfModel
-        fields = ['nerf', 'video', 'user']
+        fields = ['nerf', 'processed_data', 'user']
         read_only_fields = ['user']
 
 class NerfModelSerializer(serializers.ModelSerializer):
