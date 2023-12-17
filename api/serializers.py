@@ -38,7 +38,7 @@ class DataTypeSerializer(serializers.ModelSerializer):
         model = DataType
         fields = '__all__'
 
-from .models import Data
+from .models import ProcessedData
 
 # DATA
 
