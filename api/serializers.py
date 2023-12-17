@@ -14,19 +14,19 @@ class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(style={'input_type': 'password'})
 
-from .models import Video
+from .models import Data
 
 # VIDEOS
 
-class VideoUploadSerializer(serializers.ModelSerializer):
+class DataUploadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Video
-        fields = ['id', 'user', 'video_file', 'name', 'upload_date']
+        model = Data
+        fields = ['id', 'user', 'data_file', 'name', 'upload_date']
         read_only_fields = ['id', 'user', 'upload_date']
 
-class VideoListSerializer(serializers.ModelSerializer):
+class DataListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Video
+        model = Data
         fields = ['id', 'name', 'upload_date']
 
 from .models import DataType
