@@ -34,7 +34,7 @@ class ProcessedData(models.Model):
         ('failed', 'Failed'),
     ]
     status = models.CharField(max_length=255, choices=STATUS_DATA_CHOICES)
-    processed_data_file = models.FileField(upload_to='data/')
+    processed_data_file = models.FileField(upload_to='processed_data/')
 
     start_date = models.DateField()
     end_date = models.DateField()
