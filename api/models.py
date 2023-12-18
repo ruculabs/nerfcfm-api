@@ -68,6 +68,7 @@ class NerfModel(models.Model):
 
     model_file = models.FileField(upload_to='nerf_models/')
     nerf = models.ForeignKey(Nerf, on_delete=models.CASCADE)
+    has_normals = models.BooleanField(default=False)
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
