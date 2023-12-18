@@ -2,6 +2,15 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+class DataType(models.Model):
+    name = models.CharField(max_length=100, default='')
+    capture_device = models.CharField(max_length=100, default='')
+    requirements = models.CharField(max_length=100, default='')
+    ns_process_data_speed = models.CharField(max_length=100, default='')
+
+    def __str__(self):
+        return self.name
+
 class Data(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -11,15 +20,6 @@ class Data(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(default='')
     upload_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-class DataType(models.Model):
-    name = models.CharField(max_length=100, default='')
-    capture_device = models.CharField(max_length=100, default='')
-    requirements = models.CharField(max_length=100, default='')
-    ns_process_data_speed = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return self.name
@@ -56,6 +56,7 @@ class Nerf(models.Model):
     name = models.CharField(max_length=50, default='')
     long_name = models.CharField(max_length=100, default='')
     url = models.URLField(default='')
+    supports_normals = models.BooleanField(default=False)
     description = models.TextField(default='')
 
     def __str__(self):
