@@ -103,11 +103,17 @@ class ExportMethod(models.Model):
     def __str__(self):
         return self.name
 
+def upload_directory_obj(instance, filename):
+    return f'nerf_objects/{instance.id}/{filename}'
+
 class NerfObject(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
     
-    object_file = models.FileField(upload_to='nerf_objects/')
+    object_file = models.FileField(upload_to=upload_directory_obj)
+    texture_file = models.FileField(upload_to=upload_directory_obj)
+    material_file = models.FileField(upload_to=upload_directory_obj)
+    
     export_method = models.ForeignKey(ExportMethod, on_delete=models.CASCADE)
     
     start_date = models.DateTimeField(auto_now_add=True)
