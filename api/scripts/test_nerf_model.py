@@ -10,11 +10,11 @@ def main():
 
     min_time = float(sys.argv[1])
     max_time = float(sys.argv[2])
-    model_id = float(sys.argv[3])
+    model_id = int(sys.argv[3])
 
     random_time = random.uniform(min_time, max_time)
     print(f"[TEST Training NeRF Model] {random_time} seconds")
-    os.mkdir(f'media/nerf_models/int({model_id})/')
+    os.mkdir(f'media/nerf_models/{model_id}/')
     
     try:
         time.sleep(random_time)

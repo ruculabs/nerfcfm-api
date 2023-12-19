@@ -10,11 +10,11 @@ def main():
 
     min_time = float(sys.argv[1])
     max_time = float(sys.argv[2])
-    processed_data_id = float(sys.argv[3])
+    processed_data_id = int(sys.argv[3])
 
     random_time = random.uniform(min_time, max_time)
     print(f"[TEST Process Data] {random_time} seconds")
-    os.mkdir(f'media/processed_data/{int(processed_data_id)}/')
+    os.mkdir(f'media/processed_data/{processed_data_id}/')
     
     try:
         time.sleep(random_time)
