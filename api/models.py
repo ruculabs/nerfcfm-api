@@ -108,6 +108,7 @@ class NerfObject(models.Model):
     nerf_model = models.ForeignKey(NerfModel, on_delete=models.CASCADE)
     
     object_file = models.FileField(upload_to='nerf_objects/')
+    export_method = models.ForeignKey(ExportMethod, on_delete=models.CASCADE)
     
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
