@@ -34,7 +34,7 @@ def generate_processed_data(data: dict, processed_data_id: int) -> None:
             ns_process_data_command = f"ns-process-data video --data media/data/{data_name}/ --output-dir media/processed_data/{processed_data_id}/"
             process_command = f"{ACTIVATE_NERF_STUDIO_COMMAND} && {ns_process_data_command}"
         
-        processed_data_result = subprocess.run(process_command)
+        process_data_result = subprocess.run(process_command)
         
         if process_data_result.returncode == 0:
                 processed_data.status = 'complete'
