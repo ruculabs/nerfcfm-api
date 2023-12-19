@@ -33,12 +33,12 @@ class ProcessedData(models.Model):
         ('complete', 'Complete'),
         ('failed', 'Failed'),
     ]
-    status = models.CharField(max_length=255, choices=STATUS_DATA_CHOICES)
+    status = models.CharField(max_length=255, choices=STATUS_DATA_CHOICES, default='in_progress')
     processed_data_file = models.FileField(upload_to='processed_data/')
 
-    start_date = models.DateField()
-    end_date = models.DateField()
-    processing_time = models.DurationField()
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    processing_time = models.DurationField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
@@ -46,7 +46,7 @@ class ProcessedData(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.video.name}{self.data_type}Name"
+        return f"{self.id}-{self.data.data_type.name}"
 
     def save_endtime(self):
         self.end_date = timezone.now()
@@ -91,7 +91,7 @@ class NerfModel(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.nerf.name}Model"
+        return f"{self.id}{self.nerf.name}Model"
 
 ### NerfModel -> NerfObject
 
@@ -123,7 +123,7 @@ class NerfObject(models.Model):
 
     def save(self, *args, **kwargs):
         if self.start_date and self.end_date:
-            self.export = self.end_date - self.start_date
+            self.export_time = self.end_date - self.start_date
         super().save(*args, **kwargs)
     
     def save_endtime(self):
@@ -131,7 +131,7 @@ class NerfObject(models.Model):
         self.save()
     
     def __str__(self):
-        return f"{self.nerf_model}Object"
+        return f"{self.id}Object"
 
 ### Reviews
 
