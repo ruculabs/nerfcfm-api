@@ -78,31 +78,23 @@ def generate_nerf_model(data: dict, nerf_model_id: int) -> None:
     
     try:
 
+        train_command = None
         if(os.getenv("USE_TEST_SCRIPT")):
-            
-            train_result = subprocess.run(['python', 'api/scripts/test_nerf_model.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_model.id)])
-            
-            if train_result.returncode == 0:
-                nerf_model.status = 'complete'
-                print("[GENERATE_MODEL_TASK]: SUCCESS")
-            else:
-                nerf_model.status = 'failed'
-                print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
-            
-            nerf_model.save_endtime()
-
+            train_command = ['python', 'api/scripts/test_nerf_model.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_model.id)]
         else:
+            ns_train_command = f"ns-train nerfacto --data media/processed_data/{processed_data_id}/ --output-dir media/nerf_models/{nerf_model_id}/ --viewer.quit-on-train-completion True"          
+            train_command = f"{ACTIVATE_NERF_STUDIO_COMMAND} && {ns_train_command}"
 
-            train_command = f"ns-train nerfacto --data media/processed_data/{processed_data_id}/ --output-dir media/nerf_models/{nerf_model_id}/ --viewer.quit-on-train-completion True"
-            train_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {train_command}")
-
-            if train_result.returncode == 0:
-                nerf_model.status = 'complete'
-            else:
-                nerf_model.status = 'failed'
-                print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
-            
-            nerf_model.save_endtime()
+        train_result = subprocess.run(train_command)
+        
+        if train_result.returncode == 0:
+            nerf_model.status = 'complete'
+            print("[GENERATE_MODEL_TASK]: SUCCESS")
+        else:
+            nerf_model.status = 'failed'
+            print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
+    
+        nerf_model.save_endtime()
 
     except Exception as e:
 
