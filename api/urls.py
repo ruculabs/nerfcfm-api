@@ -28,6 +28,7 @@ urlpatterns = [
     # data
     path('data/upload/', DataUploadView.as_view(), name='upload-data'),
     path('data/user/', UserDataView.as_view(), name='user-data'),
+    path('data/<int:data_id>/', UserDataView.as_view(), name='id-data'),
 
     # data types
     path('data-types/all/', AllDataTypesView.as_view(), name='all-data-types'),
@@ -35,6 +36,7 @@ urlpatterns = [
     # processed-data
     path('processed-data/generate/', GenerateProcessedDataView.as_view(), name='generate-processed-data'),
     path('processed-data/user/', UserProcessedDataView.as_view(), name='user-processed-data'),
+    path('processed-data/<int:processed_data_id>/', UserDataView.as_view(), name='id-processed-data'),
 
     # nerfs
     path('nerfs/all/', AllNerfsView.as_view(), name='all-nerfs'),
@@ -42,13 +44,14 @@ urlpatterns = [
     # nerf models
     path('nerf-models/all/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
     path('nerf-models/user/', UserNerfModelsView.as_view(), name='user-nerf-models'),
+    path('nerf-models/<int:nerf_model_id>/', UserNerfObjectsView.as_view(), name='id-nerf-objects'),
 
     # export methods
     path('export-methods/all/', AllExportMethodsView.as_view(), name='all-export-methods'),
 
     # nerf objects
-    path('nerf-objects/generate', GenerateNerfObjectView.as_view(), name='generate-nerf-object'),
-    path('nerf-objects/user', UserNerfObjectsView.as_view(), name='user-nerf-objects'),
+    path('nerf-objects/generate/', GenerateNerfObjectView.as_view(), name='generate-nerf-object'),
+    path('nerf-objects/user/', UserNerfObjectsView.as_view(), name='user-nerf-objects'),
     path('nerf-objects/<int:nerf_object_id>/', UserNerfObjectsView.as_view(), name='id-nerf-objects'),
     path('nerf-objects/<int:nerf_object_id>/object/', UserNerfObjectsView.as_view(), name='object-nerf-objects'),
     path('nerf-objects/<int:nerf_object_id>/texture/', UserNerfObjectsView.as_view(), name='texture-nerf-objects'),
