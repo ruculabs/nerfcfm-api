@@ -4,6 +4,8 @@ from celery import shared_task
 import os
 from dotenv import load_dotenv
 
+from django.core.files import File
+
 load_dotenv()
 
 ACTIVATE_NERF_STUDIO_COMMAND = "conda activate nerfstudio"
@@ -127,32 +129,33 @@ def generate_nerf_object(data: dict, nerf_object_id: int) -> None:
     
     try:
 
+        export_command = None
         if(os.getenv("USE_TEST_SCRIPT")):
-            
-            train_result = subprocess.run(['python', 'api/scripts/test_nerf_object.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_object.id)])
-            
-            if train_result.returncode == 0:
-                nerf_model.status = 'complete'
-                print("[GENERATE_OBJECT_TASK]: SUCCESS")
-            else:
-                nerf_model.status = 'failed'
-                print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
-            
-            nerf_object.save_endtime()
-
+            export_command = ['python', 'api/scripts/test_nerf_object.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_object.id)]
         else:
-
-            export_command = f"ns-export {export_method.name} --data media/nerf_models/{nerf_model_id}/{nerf_model.nerf.name}/{nerf}/ --output-dir media/nerf_objects/{nerf_object_id}/"
-            export_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {export_command}")
-
-            if export_result.returncode == 0:
-                nerf_object.status = 'complete'
-            else:
-                nerf_object.status = 'failed'
-                print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
+            ns_export_command = f"ns-export {export_method.name} --data media/nerf_models/{nerf_model_id}/{nerf_model.nerf.name}/{nerf}/ --output-dir media/nerf_objects/{nerf_object_id}/"
+            export_command = f"{ACTIVATE_NERF_STUDIO_COMMAND} && {ns_export_command}"
+        
+        export_result = subprocess.run(export_command)
             
-            nerf_object.save_endtime()
-
+        if export_result.returncode == 0:
+            nerf_object.object_file.save('mesh.obj', 
+                                File(open(f'media/nerf_objects/{nerf_object_id}/mesh.obj', 'rb')), 
+                                save=True)
+            nerf_object.texture_file.save('material_0.png', 
+                                File(open(f'media/nerf_objects/{nerf_object_id}/material_0.png', 'rb')), 
+                                save=True)
+            nerf_object.material_file.save(f'material_0.mtl', 
+                                File(open(f'media/nerf_objects/{nerf_object_id}/material_0.mtl', 'rb')), 
+                                save=True)
+            nerf_object.status = 'complete'
+            print("[GENERATE_OBJECT_TASK]: SUCCESS")
+        else:
+            nerf_object.status = 'failed'
+            print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
+            
+        nerf_object.save_endtime()
+            
     except Exception as e:
 
         nerf_object.status = 'failed'
