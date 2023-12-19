@@ -6,6 +6,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
+from django.shortcuts import get_object_or_404
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -40,7 +42,7 @@ class UserLoginView(ObtainAuthToken):
 
 # data
 from .models import Data 
-from .serializers import DataUploadSerializer, DataListSerializer
+from .serializers import DataUploadSerializer, DataListSerializer, DataSerializer
 
 class DataUploadView(generics.CreateAPIView):
     queryset = Data.objects.all()
@@ -57,6 +59,11 @@ class UserDataView(generics.ListAPIView):
     def get_queryset(self):
         return Data.objects.filter(user=self.request.user)
 
+class DataDetailView(generics.RetrieveAPIView):
+    queryset = Data.objects.all()
+    serializer_class = DataSerializer
+    lookup_field = 'id' 
+
 # data types
 from .models import DataType
 from .serializers import DataTypeSerializer
@@ -67,7 +74,7 @@ class AllDataTypesView(generics.ListAPIView):
 
 # data
 from .models import ProcessedData
-from .serializers import GenerateProcessedDataSerializer, UserProcessedDataSerializer
+from .serializers import GenerateProcessedDataSerializer, UserProcessedDataSerializer, ProcessedDataSerializer
 from .utils import generate_processed_data
 
 class GenerateProcessedDataView(generics.CreateAPIView):
@@ -85,6 +92,11 @@ class UserProcessedDataView(generics.ListAPIView):
     def get_queryset(self):
         return ProcessedData.objects.filter(user=self.request.user)
 
+class ProcessedDataDetailView(generics.RetrieveAPIView):
+    queryset = ProcessedData.objects.all()
+    serializer_class = ProcessedDataSerializer
+    lookup_field = 'id'
+
 # nerfs
 from .models import Nerf
 from .serializers import NerfSerializer
@@ -95,6 +107,7 @@ class AllNerfsView(generics.ListAPIView):
     serializer_class = NerfSerializer
 
 # nerf models
+from .models import NerfModel
 from .serializers import NerfModelSerializer, GenerateNerfModelSerializer, NerfModelListSerializer
 from .utils import generate_nerf_model
 
@@ -112,6 +125,11 @@ class UserNerfModelsView(generics.ListAPIView):
 
     def get_queryset(self):
         return NerfModel.objects.filter(user=self.request.user)
+
+class NerfModelDetailView(generics.RetrieveAPIView):
+    queryset = NerfModel.objects.all()
+    serializer_class = NerfModelSerializer
+    lookup_field = 'id'
 
 # export methods
 from .models import ExportMethod
@@ -139,7 +157,22 @@ class UserNerfObjectsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Objeto.objects.filter(modelo__video__usuario=self.request.user)
+        return NerfObject.objects.filter(user=self.request.user)
+
+class NerfObjectDetailView(generics.RetrieveAPIView):
+    queryset = NerfObject.objects.all()
+    serializer_class = NerfObjectSerializer
+    lookup_field = 'id'
+
+class MeshNerfObjectView(generics.RetrieveAPIView):
+    pass
+
+class TextureNerfObjectView(generics.RetrieveAPIView):
+    pass
+
+class MaterialNerfObjectView(generics.RetrieveAPIView):
+    pass
+
 
 # reviews
 from .models import Review
