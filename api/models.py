@@ -9,7 +9,7 @@ class DataType(models.Model):
     ns_process_data_speed = models.CharField(max_length=100, default='')
 
     def __str__(self):
-        return self.name
+        return f"{self.id} | {self.name}"
 
 class Data(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -22,7 +22,7 @@ class Data(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.id} | {self.data_type.name}"
 
 class ProcessedData(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -45,12 +45,12 @@ class ProcessedData(models.Model):
             self.processing_time = self.end_date - self.start_date
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f"{self.id}-{self.data.data_type.name}"
-
     def save_endtime(self):
         self.end_date = timezone.now()
         self.save()
+
+    def __str__(self):
+        return f"{self.id} | {self.data.id} {self.data.data_type.name}"
 
 class Nerf(models.Model):
     name = models.CharField(max_length=50, default='')
@@ -60,7 +60,7 @@ class Nerf(models.Model):
     description = models.TextField(default='')
 
     def __str__(self):
-        return self.name
+        return f"{self.id} | {self.name}"
 
 class NerfModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -91,7 +91,7 @@ class NerfModel(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.id}{self.nerf.name}Model"
+        return f"{self.id} | {self.processed_data.id} {self.nerf.name}"
 
 ### NerfModel -> NerfObject
 
@@ -101,7 +101,7 @@ class ExportMethod(models.Model):
     description = models.TextField(default='')
 
     def __str__(self):
-        return self.name
+        return f"{self.id} | {self.long_name}"
 
 def upload_directory_obj(instance, filename):
     return f'nerf_objects/{instance.id}/{filename}'
@@ -137,7 +137,7 @@ class NerfObject(models.Model):
         self.save()
     
     def __str__(self):
-        return f"{self.id}Object"
+        return f"{self.id} | {self.nerf_model.id} {self.nerf_model.processed_data.data.data_type.name} {self.nerf_model.nerf.name} {self.export_method.name}"
 
 ### Reviews
 
@@ -159,4 +159,4 @@ class Review(models.Model):
     date_posted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.nerf_object}"
+        return f"{self.id} | {self.nerf_object.id}"
