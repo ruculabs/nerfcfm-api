@@ -24,7 +24,7 @@ python manage.py load_data_types
 # Arch
 sudo pacman -S redis
 # Debian / Ubuntu
-sudo apt get redis
+sudo apt-get install redis
 
 # start redis server
 redis-server
