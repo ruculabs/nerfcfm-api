@@ -42,7 +42,7 @@ urlpatterns = [
     path('nerfs/all/', AllNerfsView.as_view(), name='all-nerfs'),
 
     # nerf models
-    path('nerf-models/all/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
+    path('nerf-models/generate/', GenerateNerfModelView.as_view(), name='generate-nerf-model'),
     path('nerf-models/user/', UserNerfModelsView.as_view(), name='user-nerf-models'),
     path('nerf-models/<int:nerf_model_id>/', UserNerfObjectsView.as_view(), name='id-nerf-objects'),
 
