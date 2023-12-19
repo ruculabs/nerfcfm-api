@@ -164,15 +164,42 @@ class NerfObjectDetailView(generics.RetrieveAPIView):
     serializer_class = NerfObjectSerializer
     lookup_field = 'id'
 
-class MeshNerfObjectView(generics.RetrieveAPIView):
-    pass
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.core.files import File
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-class TextureNerfObjectView(generics.RetrieveAPIView):
-    pass
+class MeshNerfObjectView(APIView):
+    def get(self, request, nerf_object_id):
+        nerf_object = get_object_or_404(NerfObject, pk=nerf_object_id)
+        file_path = nerf_object.object_file.path
 
-class MaterialNerfObjectView(generics.RetrieveAPIView):
-    pass
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={nerf_object.object_file.name}'
+            return response
 
+class TextureNerfObjectView(APIView):
+    def get(self, request, nerf_object_id):
+        nerf_object = get_object_or_404(NerfObject, pk=nerf_object_id)
+        file_path = nerf_object.texture_file.path
+
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={nerf_object.texture_file.name}'
+            return response
+
+class MaterialNerfObjectView(APIView):
+    def get(self, request, nerf_object_id):
+        nerf_object = get_object_or_404(NerfObject, pk=nerf_object_id)
+        file_path = nerf_object.material_file.path
+
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={nerf_object.material_file.name}'
+            return response
 
 # reviews
 from .models import Review
