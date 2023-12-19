@@ -29,6 +29,11 @@ class DataListSerializer(serializers.ModelSerializer):
         model = Data
         fields = ['id', 'name', 'upload_date']
 
+class DataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Data
+        fields = '__all__'
+
 from .models import DataType
 
 # DATA TYPE
@@ -52,6 +57,12 @@ class UserProcessedDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProcessedData
         fields = '__all__'
+
+class ProcessedDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessedData
+        fields = '__all__'
+
 
 from .models import Nerf
 
