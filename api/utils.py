@@ -25,33 +25,25 @@ def generate_processed_data(data: dict, processed_data_id: int) -> None:
     
     try:
 
+        process_command = None
         if(os.getenv("USE_TEST_SCRIPT")):
-            
-            process_data_result = subprocess.run(['python', 'api/scripts/test_process_data.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(processed_data.id)])
-            
-            if process_data_result.returncode == 0:
-                processed_data.status = 'complete'
-                print("[PROCESS_DATA_TASK]: SUCCESS")
-            else:
-                processed_data.status = 'failed'
-                print("[PROCESS_DATA_TASK]: RETCODE ERROR (not 0)")
-            
-            processed_data.save_endtime()
-
+            process_command = ['python', 'api/scripts/test_process_data.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(processed_data.id)]
         else:
             data_path = data.data_file.name
             data_name = data_path.split("/")[-1]
-
-            process_data_command = f"ns-process-data video --data media/data/{data_name}/ --output-dir media/processed_data/{processed_data_id}/"
-            process_data_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {process_data_command}")
-
-            if process_data_result.returncode == 0:
+            ns_process_data_command = f"ns-process-data video --data media/data/{data_name}/ --output-dir media/processed_data/{processed_data_id}/"
+            process_command = f"{ACTIVATE_NERF_STUDIO_COMMAND} && {ns_process_data_command}"
+        
+        processed_data_result = subprocess.run(process_command)
+        
+        if process_data_result.returncode == 0:
                 processed_data.status = 'complete'
-            else:
+                print("[PROCESS_DATA_TASK]: SUCCESS")
+        else:
                 processed_data.status = 'failed'
                 print("[PROCESS_DATA_TASK]: RETCODE ERROR (not 0)")
             
-            processed_data.save_endtime()
+        processed_data.save_endtime()
 
     except Exception as e:
 
