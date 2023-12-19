@@ -68,16 +68,15 @@ class AllDataTypesView(generics.ListAPIView):
 # data
 from .models import ProcessedData
 from .serializers import GenerateProcessedDataSerializer, UserProcessedDataSerializer
-from .utils import generate_nerf_object
+from .utils import generate_processed_data
 
 class GenerateProcessedDataView(generics.CreateAPIView):
-    queryset = ProcessedData.objects.all()
     serializer_class = GenerateProcessedDataSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        generate_data.delay(serializer.data)
+        processed_data = serializer.save(user=self.request.user)
+        generate_processed_data.delay(serializer.data, processed_data.id)
 
 class UserProcessedDataView(generics.ListAPIView):
     serializer_class = UserProcessedDataSerializer
@@ -104,8 +103,8 @@ class GenerateNerfModelView(generics.CreateAPIView):
     serializer_class = GenerateNerfModelSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        generate_nerf_model.delay(serializer.data) 
+        nerf_model = serializer.save(user=self.request.user)
+        generate_nerf_model.delay(serializer.data, nerf_model.id) 
 
 class UserNerfModelsView(generics.ListAPIView):
     serializer_class = NerfModelListSerializer
@@ -132,8 +131,8 @@ class GenerateNerfObjectView(generics.CreateAPIView):
     serializer_class = GenerateNerfObjectSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        generate_nerf_object.delay(serializer.data)
+        nerf_object = serializer.save(user=self.request.user)
+        generate_nerf_object.delay(serializer.data, nerf_object.id)
 
 class UserNerfObjectsView(generics.ListAPIView):
     serializer_class = NerfObjectSerializer
