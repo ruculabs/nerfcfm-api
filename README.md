@@ -14,7 +14,7 @@ This is basic implementation for the NerFCFM backend, it does not consider many 
 virtualenv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python manage.py makemigrations
+python manage.py makemigrations api
 python manage.py migrate
 python manage.py load_nerfs
 python manage.py load_data_types
