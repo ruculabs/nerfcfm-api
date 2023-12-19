@@ -1,63 +1,165 @@
 import subprocess
-from .models import User, Video, Nerf, NerfModel, NerfObject
+from .models import User, Data, ProcessedData, ExportMethod, Nerf, NerfModel, NerfObject
 from celery import shared_task
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ACTIVATE_NERF_STUDIO_COMMAND = "conda activate nerfstudio"
+# ACTIVATE_FFMPEG = 'export PATH="$HOME/ffmpeg_build/bin:$PATH"'
 
 @shared_task
-def generate_nerf_model(nerf: Nerf, video: Video, user: User, nerf_model_id: int) -> None:
+def generate_processed_data(data: dict, processed_data_id: int) -> None:
+
+    print(data)
+    user_id = data.get('user')
+    data_id = data.get('data')
+
+    user = User.objects.get(id=user_id)
+    data = Data.objects.get(id=data_id)
+
+    processed_data = ProcessedData.objects.get(id=processed_data_id)
     
     try:
-        
-        # run command
-        result = subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
-        
-        # get nerf_model after result
-        nerf_model = NerfModel.objects.get(id=nerf_model_id)
 
-        if result.returncode == 0:
-            nerf_model.status = 'complete'
+        if(os.getenv("USE_TEST_SCRIPT")):
+            
+            process_data_result = subprocess.run(['python', 'api/scripts/test_process_data.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(processed_data.id)])
+            
+            if process_data_result.returncode == 0:
+                processed_data.status = 'complete'
+                print("[PROCESS_DATA_TASK]: SUCCESS")
+            else:
+                processed_data.status = 'failed'
+                print("[PROCESS_DATA_TASK]: RETCODE ERROR (not 0)")
+            
+            processed_data.save_endtime()
+
         else:
-            nerf_model.status = 'failed'
-            print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
-        
-        nerf_model.save_endtime()
+            data_path = data.data_file.name
+            data_name = data_path.split("/")[-1]
+
+            process_data_command = f"ns-process-data video --data media/data/{data_name}/ --output-dir media/processed_data/{processed_data_id}/"
+            process_data_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {process_data_command}")
+
+            if process_data_result.returncode == 0:
+                processed_data.status = 'complete'
+            else:
+                processed_data.status = 'failed'
+                print("[PROCESS_DATA_TASK]: RETCODE ERROR (not 0)")
+            
+            processed_data.save_endtime()
 
     except Exception as e:
 
-        nerf_model = NerfModel.objects.get(id=nerf_model_id)
+        processed_data.status = 'failed'
+        processed_data.save_endtime()
+        print("[PROCESS_DATA_TASK]: ERROR")
+        print('-- PROCESS_DATA EXCEPTION START --')
+        print(e)
+        print('-- PROCESS_DATA EXCEPTION END --')
+
+@shared_task
+def generate_nerf_model(data: dict, nerf_model_id: int) -> None:
+
+    print(data)
+    processed_data_id = data.get('processed_data')
+    nerf_id = data.get('nerf')
+    user_id = data.get('user')
+
+    user = User.objects.get(id=user_id)
+    nerf = Nerf.objects.get(id=nerf_id)
+    processed_data = ProcessedData.objects.get(id=processed_data_id)
+
+    nerf_model = NerfModel.objects.get(id=nerf_model_id)
+    
+    try:
+
+        if(os.getenv("USE_TEST_SCRIPT")):
+            
+            train_result = subprocess.run(['python', 'api/scripts/test_nerf_model.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_model.id)])
+            
+            if train_result.returncode == 0:
+                nerf_model.status = 'complete'
+                print("[GENERATE_MODEL_TASK]: SUCCESS")
+            else:
+                nerf_model.status = 'failed'
+                print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
+            
+            nerf_model.save_endtime()
+
+        else:
+
+            train_command = f"ns-train nerfacto --data media/processed_data/{processed_data_id}/ --output-dir media/nerf_models/{nerf_model_id}/ --viewer.quit-on-train-completion True"
+            train_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {train_command}")
+
+            if train_result.returncode == 0:
+                nerf_model.status = 'complete'
+            else:
+                nerf_model.status = 'failed'
+                print("[GENERATE_MODEL_TASK]: RETCODE ERROR (not 0)")
+            
+            nerf_model.save_endtime()
+
+    except Exception as e:
+
         nerf_model.status = 'failed'
         nerf_model.save_endtime()
         print("[GENERATE_MODEL_TASK]: ERROR")
         print('-- GENERATE_NERF_MODEL EXCEPTION START --')
-        print(err)
+        print(e)
         print('-- GENERATE_NERF_MODEL EXCEPTION END --')
 
 @shared_task
-def generate_nerf_object(nerf_model: NerfModel, user: User, nerf_object_id: int, method: str = 'TSDF') -> None:
+def generate_nerf_object(data: dict, nerf_object_id: int) -> None:
 
+    print(data)
+    nerf_model_id = data.get('nerf_model')
+    export_method_id = data.get('export_method')
+    user_id = data.get('user')
+
+    user = User.objects.get(id=user_id)
+    export_method = ExportMethod.objects.get(id=export_method_id)
+    nerf_model = NerfModel.objects.get(id=nerf_model_id)
+
+    nerf_object = NerfObject.objects.get(id=nerf_object_id)
+    
     try:
-        
-        # run command
-        result = subprocess.run(['python', 'ruta/a/tu/otro_script.py', modelo.archivo.path])
-        
-        # get nerf_object after result
-        nerf_object = NerfObject.objects.get(id=nerf_object_id)
 
-        if result.returncode == 0:
-            nerf_object.status = 'complete'
+        if(os.getenv("USE_TEST_SCRIPT")):
+            
+            train_result = subprocess.run(['python', 'api/scripts/test_nerf_object.py', os.getenv("MAX_TIME_SCRIPT"), os.getenv("MIN_TIME_SCRIPT"), str(nerf_object.id)])
+            
+            if train_result.returncode == 0:
+                nerf_model.status = 'complete'
+                print("[GENERATE_OBJECT_TASK]: SUCCESS")
+            else:
+                nerf_model.status = 'failed'
+                print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
+            
+            nerf_object.save_endtime()
+
         else:
-            nerf_object.status = 'failed'
-            print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
-        
-        nerf_object.save_endtime()
+
+            export_command = f"ns-export {export_method.name} --data media/nerf_models/{nerf_model_id}/{nerf_model.nerf.name}/{nerf}/ --output-dir media/nerf_objects/{nerf_object_id}/"
+            export_result = subprocess.run(f"{ACTIVATE_NERF_STUDIO_COMMAND} && {export_command}")
+
+            if export_result.returncode == 0:
+                nerf_object.status = 'complete'
+            else:
+                nerf_object.status = 'failed'
+                print("[GENERATE_OBJECT_TASK]: RETCODE ERROR (not 0)")
+            
+            nerf_object.save_endtime()
 
     except Exception as e:
 
-        nerf_object = NerfObject.objects.get(id=nerf_object_id)
         nerf_object.status = 'failed'
-        nerf_model.save_endtime()
+        nerf_object.save_endtime()
         print("[GENERATE_OBJECT_TASK]: ERROR")
         print('-- GENERATE_NERF_OBJECT EXCEPTION START --')
-        print(err)
+        print(e)
         print('-- GENERATE_NERF_OBJECT EXCEPTION END --')
 
 import requests
