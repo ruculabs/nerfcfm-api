@@ -178,7 +178,7 @@ class MeshNerfObjectView(APIView):
 
         with open(file_path, 'rb') as file:
             response = HttpResponse(file.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={nerf_object.object_file.name}'
+            response['Content-Disposition'] = f'inline; filename={nerf_object.object_file.name}'
             return response
 
 class TextureNerfObjectView(APIView):
@@ -188,7 +188,7 @@ class TextureNerfObjectView(APIView):
 
         with open(file_path, 'rb') as file:
             response = HttpResponse(file.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={nerf_object.texture_file.name}'
+            response['Content-Disposition'] = f'inline; filename={nerf_object.texture_file.name}'
             return response
 
 class MaterialNerfObjectView(APIView):
@@ -198,7 +198,7 @@ class MaterialNerfObjectView(APIView):
 
         with open(file_path, 'rb') as file:
             response = HttpResponse(file.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={nerf_object.material_file.name}'
+            response['Content-Disposition'] = f'inline; filename={nerf_object.material_file.name}'
             return response
 
 # reviews
