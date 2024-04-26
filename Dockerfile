@@ -16,12 +16,7 @@ RUN pip install poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev --no-interaction --no-ansi
 
-# Install Redis
-RUN apt-get update && apt-get install -y redis-server
-
 # Copy the rest of the application code to the container
 COPY . /app/
 
-# Command to start Redis and run Celery
-CMD ["sh", "-c", "service redis-server start && celery -A nerfcfm.celery worker -l INFO"]
 

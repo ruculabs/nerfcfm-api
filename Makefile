@@ -1,18 +1,19 @@
-DOCKER_IMAGE_NAME = nerfcfm-api
+# Define variables
+DOCKER_COMPOSE_FILE = docker-compose.yml
 
-.PHONY: build
-build: ## Build the Docker image
-	docker build -t $(DOCKER_IMAGE_NAME) .
+.PHONY: up
+up: ## Start the Docker containers
+	docker-compose -f $(DOCKER_COMPOSE_FILE) up --build
 
-.PHONY: run
-run: ## Run the Docker container
-	docker run --rm -it -p 8000:8000 $(DOCKER_IMAGE_NAME)
+.PHONY: down
+down: ## Stop and remove the Docker containers
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down
 
 .PHONY: test
 test: ## Run tests
-	python manage.py test
+	docker-compose -f $(DOCKER_COMPOSE_FILE) exec web python manage.py test
 
 .PHONY: clean
-clean: ## Remove Docker image and clean up
-	docker image rm $(DOCKER_IMAGE_NAME)
+clean: ## Remove Docker images and clean up
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down --rmi all
 
